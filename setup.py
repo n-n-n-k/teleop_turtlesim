@@ -20,7 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'teleop_tutlesim_node = teleop_turtlesim.teleop_tutlesim_node:main'
+            'teleop_turtlesim_node = teleop_turtlesim.teleop_turtlesim_node:main'
         ],
     },
 )
