@@ -15,21 +15,12 @@ class TwistPubNode(Node):
     def __init__(self):
         # Nodeクラスのコンストラクタを呼び出してノード名をつける
         super().__init__('twist_pub_node')
-        # publisherの生成
-        # 1番目の引数：トピック通信に使用するメッセージ型
-        # 2番目の引数：出版対象のトピック名
-        # 3番目の引数：QoS設定におけるキューのサイズ
         self.publisher = self.create_publisher(Twist, 'turtle1/cmd_vel', 10)
-
-        # timerの生成
-        # 1.00秒ごとにコールバック関数timer_callbackが実行される
-        timer_period = 1.00
-        self.timer = self.create_timer(timer_period, self.timer_callback)
-
-        # Twistメッセージ型のオブジェクトの生成
+        self.timer = self.create_timer(1.0, self.timer_callback)
         self.vel = Twist()
-        # 並進速度を変化させるための符号
-        self.signed = 1
+        self.side_length = 2  # 正方形の一辺の長さ
+        self.angular_speed = 1.5708  # 90度回転の角速度
+        self.linear_speed = 1.0  # 前進速度
 
     # timerの起動間隔で実行されるコールバック関数
     def timer_callback(self):
