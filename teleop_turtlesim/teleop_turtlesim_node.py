@@ -32,24 +32,55 @@ class TwistPubNode(Node):
         self.signed = 1
 
     # timerの起動間隔で実行されるコールバック関数
-    def timer_callback(self):
-        # 現在地のxy座標とtheta値（turtlesimの向き）をログ表示
-        # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
-        self.get_logger().info("x=%f y=%f theta=%f" %
-                               (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
+   def timer_callback(self):
+    # 現在地のxy座標とtheta値（turtlesimの向き）をログ表示
+    # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
+    self.get_logger().info("x=%f y=%f theta=%f" %
+                           (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
 
-        # 並進速度[m/s]を変化させる
-        if self.vel.linear.x > 3.00:
-            self.signed = -1
-        elif self.vel.linear.x < -2.00:
-            self.signed = 1
-        self.vel.linear.x += self.signed * 0.50
+    # 正方形の1辺の長さ
+    side_length = 2.0
 
-        # 回転速度[rad/s]は一定値（90度）
-        self.vel.angular.z = 1.5708
-        
-        # 速度指令値をメッセージとして出版する
+    # 並進速度[m/s]を設定
+    linear_speed = 1.0
+
+    # 回転速度[rad/s]を設定
+    angular_speed = 1.5708  # 90度/秒
+
+    # 4辺を移動
+    for _ in range(4):
+        # 直進
+        self.vel.linear.x = linear_speed
+        self.vel.angular.z = 0.0
         self.publisher.publish(self.vel)
+        self.get_logger().info("Moving forward")
+        self.spin_once(side_length / linear_speed)
+
+        # 停止
+        self.vel.linear.x = 0.0
+        self.vel.angular.z = 0.0
+        self.publisher.publish(self.vel)
+        self.get_logger().info("Stopping")
+        self.spin_once(1.0)
+
+        # 回転
+        self.vel.linear.x = 0.0
+        self.vel.angular.z = angular_speed
+        self.publisher.publish(self.vel)
+        self.get_logger().info("Turning")
+        self.spin_once(1.5708)  # 90度回転
+
+        # 停止
+        self.vel.linear.x = 0.0
+        self.vel.angular.z = 0.0
+        self.publisher.publish(self.vel)
+        self.get_logger().info("Stopping")
+        self.spin_once(1.0)
+
+# 1回のタイマーイベントでのスピン処理
+def spin_once(self, duration):
+    # タイマーイベントで使用する回転時間を指定
+    rclpy.spin_once(self, timeout_sec=duration))
 
 
 # turtlesimの位置情報などを含むメッセージをposeから購読するノードのクラス
