@@ -32,55 +32,36 @@ class TwistPubNode(Node):
         self.signed = 1
 
     # timerの起動間隔で実行されるコールバック関数
-   def timer_callback(self):
-    # 現在地のxy座標とtheta値（turtlesimの向き）をログ表示
-    # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
-    self.get_logger().info("x=%f y=%f theta=%f" %
-                           (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
+    def timer_callback(self):
+        # 正方形を描くための動作
+        for _ in range(4):  # 正方形なので4回繰り返す
+            # 前進
+            self.vel.linear.x = self.linear_speed
+            self.publisher.publish(self.vel)
+            self.node.get_logger().info("Moving forward...")
+            rclpy.spin_once(self.node)  # コールバック関数を呼び出すために必要
+            self.node.sleep(2)  # 移動時間
 
-    # 正方形の1辺の長さ
-    side_length = 2.0
+            # 停止
+            self.vel.linear.x = 0
+            self.publisher.publish(self.vel)
+            self.node.get_logger().info("Stopping...")
+            rclpy.spin_once(self.node)  # コールバック関数を呼び出すために必要
+            self.node.sleep(1)  # 停止時間
 
-    # 並進速度[m/s]を設定
-    linear_speed = 1.0
+            # 回転
+            self.vel.angular.z = self.angular_speed
+            self.publisher.publish(self.vel)
+            self.node.get_logger().info("Rotating...")
+            rclpy.spin_once(self.node)  # コールバック関数を呼び出すために必要
+            self.node.sleep(1.5708)  # 回転時間
 
-    # 回転速度[rad/s]を設定
-    angular_speed = 1.5708  # 90度/秒
-
-    # 4辺を移動
-    for _ in range(4):
-        # 直進
-        self.vel.linear.x = linear_speed
-        self.vel.angular.z = 0.0
-        self.publisher.publish(self.vel)
-        self.get_logger().info("Moving forward")
-        self.spin_once(side_length / linear_speed)
-
-        # 停止
-        self.vel.linear.x = 0.0
-        self.vel.angular.z = 0.0
-        self.publisher.publish(self.vel)
-        self.get_logger().info("Stopping")
-        self.spin_once(1.0)
-
-        # 回転
-        self.vel.linear.x = 0.0
-        self.vel.angular.z = angular_speed
-        self.publisher.publish(self.vel)
-        self.get_logger().info("Turning")
-        self.spin_once(1.5708)  # 90度回転
-
-        # 停止
-        self.vel.linear.x = 0.0
-        self.vel.angular.z = 0.0
-        self.publisher.publish(self.vel)
-        self.get_logger().info("Stopping")
-        self.spin_once(1.0)
-
-# 1回のタイマーイベントでのスピン処理
-def spin_once(self, duration):
-    # タイマーイベントで使用する回転時間を指定
-    rclpy.spin_once(self, timeout_sec=duration))
+            # 停止
+            self.vel.angular.z = 0
+            self.publisher.publish(self.vel)
+            self.node.get_logger().info("Stopping rotation...")
+            rclpy.spin_once(self.node)  # コールバック関数を呼び出すために必要
+            self.node.sleep(1)  # 停止時間
 
 
 # turtlesimの位置情報などを含むメッセージをposeから購読するノードのクラス
@@ -143,4 +124,3 @@ def main(args=None):
 
 if __name__ == '__main__':
     main()
-
