@@ -38,7 +38,7 @@ class TwistPubNode(Node):
         # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
         self.get_logger().info("x=%f y=%f theta=%f" %
                                (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
-        if self.call_count % 4 == 0:
+        if self.call_count % 4 == 0 or self.call_count % 4 == 1 or self.call_count % 4 == 3:
             self.vel.linear.x = 2.0
             self.vel.angular.z = 0.0
             self.publisher.publish(self.vel)
