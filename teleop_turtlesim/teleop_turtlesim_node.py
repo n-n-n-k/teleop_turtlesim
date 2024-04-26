@@ -7,6 +7,7 @@ from rclpy.executors import SingleThreadedExecutor
 # トピック通信のメッセージ型をインポート
 from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
+import math
 
 
 # turtlesimを制御する速度指令値をトピックcmd_velに出版するノードのクラス
@@ -35,7 +36,7 @@ class TwistPubNode(Node):
     def timer_callback(self):
         # 現在地のxy座標とtheta値（turtlesimの向き）をログ表示
         # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
-        self.get_logger().info("x=%f y=%f theta=%f" %
+        get_logger().info("x=%f y=%f theta=%f" %
                                (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
         if self.call_count % 2 == 0:
             self.vel.linear.x = 1.0
@@ -44,9 +45,10 @@ class TwistPubNode(Node):
             self.node.get_logger().info("直進")
         else:
             self.vel.linear.x = 0.0
-            self.vel.angular.z = -3.14/8
+            self.vel.angular.z = -math.py/8
             self.publisher.publish(self.vel)
             self.node.get_logger().info("左回転")
+        self.call_count += 1
 
 # turtlesimの位置情報などを含むメッセージをposeから購読するノードのクラス
 class PoseSubNode(Node):
