@@ -45,7 +45,7 @@ class TwistPubNode(Node):
             self.get_logger().info("直進")
         else:
             self.vel.linear.x = 0.0
-            self.vel.angular.z = -math.pi/8
+            self.vel.angular.z = -math.pi/2
             self.publisher.publish(self.vel)
             self.get_logger().info("左回転")
         self.call_count += 1
