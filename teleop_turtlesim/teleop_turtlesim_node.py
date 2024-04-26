@@ -24,7 +24,7 @@ class TwistPubNode(Node):
 
         # timerの生成
         # 1.00秒ごとにコールバック関数timer_callbackが実行される
-        timer_period = 1.00
+        timer_period = 0.25
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         # Twistメッセージ型のオブジェクトの生成
@@ -38,16 +38,16 @@ class TwistPubNode(Node):
         # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
         self.get_logger().info("x=%f y=%f theta=%f" %
                                (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
-        if self.call_count <4:
-            self.vel.linear.x = 0.0
-            self.vel.angular.z = math.pi/2
-            self.publisher.publish(self.vel)
-            self.got_logger().info("左回転")
-        else:
-            self.vel.linear.x = 0.0
+        if self.call_count % 2 == 0:
+            self.vel.linear.x = 1.0
             self.vel.angular.z = 0.0
             self.publisher.publish(self.vel)
-            self.get_logger().info("停止")
+            self.get_logger().info("直進")
+        else:
+            self.vel.linear.x = 0.0
+            self.vel.angular.z = -math.pi/2
+            self.publisher.publish(self.vel)
+            self.get_logger().info("左回転")
         self.call_count += 1
 
 # turtlesimの位置情報などを含むメッセージをposeから購読するノードのクラス
