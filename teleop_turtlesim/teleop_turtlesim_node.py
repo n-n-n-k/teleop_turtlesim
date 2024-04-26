@@ -36,7 +36,7 @@ class TwistPubNode(Node):
     def timer_callback(self):
         # 現在地のxy座標とtheta値（turtlesimの向き）をログ表示
         # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
-        get_logger().info("x=%f y=%f theta=%f" %
+        self.get_logger().info("x=%f y=%f theta=%f" %
                                (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
         if self.call_count % 2 == 0:
             self.vel.linear.x = 1.0
