@@ -15,45 +15,40 @@ class TwistPubNode(Node):
     def __init__(self):
         # Nodeクラスのコンストラクタを呼び出してノード名をつける
         super().__init__('twist_pub_node')
+        # publisherの生成
+        # 1番目の引数：トピック通信に使用するメッセージ型
+        # 2番目の引数：出版対象のトピック名
+        # 3番目の引数：QoS設定におけるキューのサイズ
         self.publisher = self.create_publisher(Twist, 'turtle1/cmd_vel', 10)
-        self.timer = self.create_timer(1.0, self.timer_callback)
+
+        # timerの生成
+        # 1.00秒ごとにコールバック関数timer_callbackが実行される
+        timer_period = 1.00
+        self.timer = self.create_timer(timer_period, self.timer_callback)
+
+        # Twistメッセージ型のオブジェクトの生成
         self.vel = Twist()
-        self.side_length = 2  # 正方形の一辺の長さ
-        self.angular_speed = 1.5708  # 90度回転の角速度
-        self.linear_speed = 1.0  # 前進速度
+        # 並進速度を変化させるための符号
+        self.signed = 1
 
     # timerの起動間隔で実行されるコールバック関数
     def timer_callback(self):
-        # 正方形を描くための動作
-        for _ in range(4):  # 正方形なので4回繰り返す
-            # 前進
-            self.vel.linear.x = self.linear_speed
-            self.publisher.publish(self.vel)
-            self.node.get_logger().info("Moving forward...")
-            rclpy.spin_once(self.node)  # コールバック関数を呼び出すために必要
-            self.node.sleep(2)  # 移動時間
+        # 現在地のxy座標とtheta値（turtlesimの向き）をログ表示
+        # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
+        self.get_logger().info("x=%f y=%f theta=%f" %
+                               (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
+        self.vel.linear.x = 1.0
+        self.vel.angular.z = 0.0
+        self.publisher.publish(self.vel)
+        self.node.get_logger().info("直進")
+        self.create_timer(2.0,self.turn_left_callback)
 
-            # 停止
-            self.vel.linear.x = 0
-            self.publisher.publish(self.vel)
-            self.node.get_logger().info("Stopping...")
-            rclpy.spin_once(self.node)  # コールバック関数を呼び出すために必要
-            self.node.sleep(1)  # 停止時間
-
-            # 回転
-            self.vel.angular.z = self.angular_speed
-            self.publisher.publish(self.vel)
-            self.node.get_logger().info("Rotating...")
-            rclpy.spin_once(self.node)  # コールバック関数を呼び出すために必要
-            self.node.sleep(1.5708)  # 回転時間
-
-            # 停止
-            self.vel.angular.z = 0
-            self.publisher.publish(self.vel)
-            self.node.get_logger().info("Stopping rotation...")
-            rclpy.spin_once(self.node)  # コールバック関数を呼び出すために必要
-            self.node.sleep(1)  # 停止時間
-
+    def turn_left_callback(self):
+        self.vel.linear.x = 0.0
+        self.vel.angular.z = -1.5708
+        self.publisher.publish(self.vel)
+        self.node.get_logger().info("左回転")
+        self.create_timer(2.0,self.timer_callback)
 
 # turtlesimの位置情報などを含むメッセージをposeから購読するノードのクラス
 class PoseSubNode(Node):
