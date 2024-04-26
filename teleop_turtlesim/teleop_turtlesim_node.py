@@ -24,7 +24,7 @@ class TwistPubNode(Node):
 
         # timerの生成
         # 1.00秒ごとにコールバック関数timer_callbackが実行される
-        timer_period = 1.00
+        timer_period = 4.00
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         # Twistメッセージ型のオブジェクトの生成
