@@ -87,7 +87,7 @@ def main(args=None):
     # クラス定義からノードを生成してコンストラクタを実行
     twist_pub_node = TwistPubNode()
     pose_sub_node = PoseSubNode()
-
+    
     # executorと呼ばれるROS 2ノードのスケジューラに相当する機構を生成
     executor = SingleThreadedExecutor()
     # executorにノードを登録
