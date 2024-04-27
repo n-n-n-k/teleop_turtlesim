@@ -7,7 +7,6 @@ from rclpy.executors import SingleThreadedExecutor
 # トピック通信のメッセージ型をインポート
 from geometry_msgs.msg import Twist
 from turtlesim.msg import Pose
-import math
 
 
 # turtlesimを制御する速度指令値をトピックcmd_velに出版するノードのクラス
@@ -24,13 +23,13 @@ class TwistPubNode(Node):
 
         # timerの生成
         # 1.00秒ごとにコールバック関数timer_callbackが実行される
-        timer_period = 4.00
+        timer_period = 1.00
         self.timer = self.create_timer(timer_period, self.timer_callback)
 
         # Twistメッセージ型のオブジェクトの生成
         self.vel = Twist()
-        # 何回目の呼び出しかをカウントする変数
-        self.call_count = 0
+        # 並進速度を変化させるための符号
+        self.signed = 1
 
     # timerの起動間隔で実行されるコールバック関数
     def timer_callback(self):
@@ -38,17 +37,20 @@ class TwistPubNode(Node):
         # 値はpose_sub_nodeの購読値を対応するクラス変数から取得
         self.get_logger().info("x=%f y=%f theta=%f" %
                                (PoseSubNode.pose.x, PoseSubNode.pose.y, PoseSubNode.pose.theta))
-        if self.call_count % 2 != 0:
-            self.vel.linear.x = 5.0
-            self.vel.angular.z = 0.0
-            self.publisher.publish(self.vel)
-            self.get_logger().info("直進")
-        else:
-            self.vel.linear.x = 0.0
-            self.vel.angular.z = math.pi/2
-            self.publisher.publish(self.vel)
-            self.get_logger().info("左回転")
-        self.call_count += 1
+
+        # 並進速度[m/s]を変化させる
+        if self.vel.linear.x > 3.00:
+            self.signed = -1
+        elif self.vel.linear.x < -2.00:
+            self.signed = 1
+        self.vel.linear.x += self.signed * 0.50
+
+        # 回転速度[rad/s]は一定値（90度）
+        self.vel.angular.z = 1.5708
+        
+        # 速度指令値をメッセージとして出版する
+        self.publisher.publish(self.vel)
+
 
 # turtlesimの位置情報などを含むメッセージをposeから購読するノードのクラス
 class PoseSubNode(Node):
