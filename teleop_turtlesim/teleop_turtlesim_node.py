@@ -88,6 +88,7 @@ def main(args=None):
     twist_pub_node = TwistPubNode()
     pose_sub_node = PoseSubNode()
     
+
     # executorと呼ばれるROS 2ノードのスケジューラに相当する機構を生成
     executor = SingleThreadedExecutor()
     # executorにノードを登録
